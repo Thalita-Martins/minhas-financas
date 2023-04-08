@@ -1,7 +1,6 @@
 package com.tmartins.minhasfinancas.service;
 
 import com.tmartins.minhasfinancas.domain.Lancamento;
-import com.tmartins.minhasfinancas.domain.Usuario;
 import com.tmartins.minhasfinancas.dto.AtualizaStatusDTO;
 import com.tmartins.minhasfinancas.dto.LancamentoDTO;
 import com.tmartins.minhasfinancas.enumeration.StatusLancamento;
@@ -14,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +31,6 @@ public class LancamentoService {
         this.lancamentoRepository = repository;
         this.usuarioRepository = usuarioRepository;
     }
-
 
     public List<Lancamento> findAll() {
         return lancamentoRepository.findAll();
@@ -63,9 +59,9 @@ public class LancamentoService {
     public BigDecimal obterSaldoPorUsuario(Long usuarioId) {
 
         var receitas = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuarioEStatus(usuarioId,
-                TipoLancamento.RECEITA, StatusLancamento.EFETIVADO);
+                TipoLancamento.RECEITA, StatusLancamento.QUITADO);
         var despesas = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuarioEStatus(usuarioId,
-                TipoLancamento.DESPESA, StatusLancamento.EFETIVADO);
+                TipoLancamento.DESPESA, StatusLancamento.QUITADO);
 
         if (isNull(receitas)) {
             receitas = BigDecimal.ZERO;
@@ -109,10 +105,21 @@ public class LancamentoService {
                 .ano(lancamentoDTO.getAno())
                 .valor(lancamentoDTO.getValor())
                 .tipoLancamento(TipoLancamento.valueOf(lancamentoDTO.getTipo()))
-                .statusLancamento(StatusLancamento.EFETIVADO)
+                .statusLancamento(StatusLancamento.PENDENTE)
                 .ativo(lancamentoDTO.getAtivo())
                 .usuario(lancamentoDTO.getUsuario())
                 .build();
         return lancamento;
+    }
+
+    public BigDecimal totalValorByTipoDespesa(Long usuarioId, String tipoDespesa, String statusDespesa) {
+        if (statusDespesa.equals("")){
+            statusDespesa = "QUITADO";
+        }
+        var total = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuarioEStatus(usuarioId, TipoLancamento.valueOf(tipoDespesa), StatusLancamento.valueOf(statusDespesa));
+        if(isNull(total)){
+            total = BigDecimal.ZERO;
+        }
+        return total;
     }
 }

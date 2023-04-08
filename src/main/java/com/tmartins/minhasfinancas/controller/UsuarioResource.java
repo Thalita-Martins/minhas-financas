@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
-import static java.util.Objects.isNull;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -21,7 +20,6 @@ import static java.util.Objects.isNull;
 public class UsuarioResource {
 
     private final UsuarioService usuarioService;
-
 
     @GetMapping
     public ResponseEntity findAllUsuario() {
@@ -47,10 +45,33 @@ public class UsuarioResource {
     public ResponseEntity obterSaldoByUsuarioId(@PathVariable("usuarioId") Long usuarioId) {
         var saldo = usuarioService.findBySaldoByUsuarioId(usuarioId);
 
-        if (isNull(saldo)) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        try{
+            return ResponseEntity.ok(saldo);
+        } catch (RegraNegocioException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return ResponseEntity.ok(saldo);
+    }
+
+    @GetMapping("/obterTotal")
+    public ResponseEntity obterTotalByTipoDespesa(@RequestParam(value = "usuarioId") Long usuarioId, @RequestParam(value = "tipoDespesa") String tipoDespesa) {
+        var saldo = usuarioService.findByTotalDespesa(usuarioId, tipoDespesa, "");
+
+        try {
+            return ResponseEntity.ok(saldo);
+        } catch (RegraNegocioException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{usuarioId}/totalDespesa")
+    public ResponseEntity obterTotalByTipoDespesaStatus(@PathVariable("usuarioId") Long usuarioId, @RequestParam(value = "tipoDespesa") String tipoDespesa, @RequestParam(value = "statusDespesa") String statusDespesa) {
+        var saldo = usuarioService.findByTotalDespesa(usuarioId, tipoDespesa, statusDespesa);
+
+        try {
+            return ResponseEntity.ok(saldo);
+        } catch (RegraNegocioException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/autenticar")
@@ -86,11 +107,11 @@ public class UsuarioResource {
 
     @DeleteMapping("/{usuarioId}/deletar")
     public ResponseEntity deletarUsuarioId(@PathVariable("usuarioId") Long usuarioId) {
-      try{
-          Boolean usuario = usuarioService.delete(usuarioId);
-          return new ResponseEntity(usuario, HttpStatus.CREATED);
-      }catch (RegraNegocioException e) {
-          return ResponseEntity.badRequest().body(e.getMessage());
-      }
+        try {
+            Boolean usuario = usuarioService.delete(usuarioId);
+            return new ResponseEntity(usuario, HttpStatus.CREATED);
+        } catch (RegraNegocioException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

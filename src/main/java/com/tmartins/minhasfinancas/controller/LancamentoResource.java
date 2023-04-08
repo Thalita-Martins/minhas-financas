@@ -73,8 +73,8 @@ public class LancamentoResource {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity updateLancamento(@PathVariable Long id, @RequestBody LancamentoDTO lancamentoDTO) {
+    @PutMapping("/atualizar")
+    public ResponseEntity updateLancamento(@RequestBody LancamentoDTO lancamentoDTO) {
         var lancamento = lancamentoService.update(lancamentoDTO);
         try{
             return ResponseEntity.ok(lancamento);

@@ -110,4 +110,10 @@ public class UsuarioService {
                 .ativo(usuarioDTO.getAtivo()).build();
         return usuario;
     }
+
+    public BigDecimal findByTotalDespesa(Long usuarioId, String tipoDespesa,String statusDespesa) {
+        var usuario = usuarioRepository.findById(usuarioId).orElseThrow(() -> new RegraNegocioException("Usuário não encontrado"));
+
+        return lancamentoService.totalValorByTipoDespesa(usuarioId,tipoDespesa,statusDespesa);
+    }
 }
