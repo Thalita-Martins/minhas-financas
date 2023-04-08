@@ -41,14 +41,14 @@ public class LancamentoService {
     }
 
     @Transactional(readOnly = true)
-    public Lancamento findByUsuarioId(Long usuarioId) {
-        var usuario = usuarioRepository.findById(usuarioId).orElse(null);
+    public List<Lancamento> findByUsuarioId(Long usuarioId) {
+        var usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado"));
         return lancamentoRepository.findByUsuario(usuario);
     }
 
     public Lancamento atualizarStatus(Long id, AtualizaStatusDTO atualizaStatusDTO) {
-        var lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new RegraNegocioException("Lancamento " +
-                "não encontrado"));
+        var lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new RegraNegocioException("Lancamento não encontrado"));
         lancamento.setStatusLancamento(StatusLancamento.valueOf(atualizaStatusDTO.getStatus()));
         return lancamento;
     }

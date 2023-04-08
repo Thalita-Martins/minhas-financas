@@ -1,5 +1,6 @@
 package com.tmartins.minhasfinancas.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.tmartins.minhasfinancas.domain.Lancamento;
@@ -38,11 +39,16 @@ public class LancamentoResource {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-        public ResponseEntity findLancamentoByUsuarioId(@PathVariable("usuarioId") Long usuarioId){
-        Lancamento lancamentos = lancamentoService.findByUsuarioId(usuarioId);
-        try{
-            return ResponseEntity.ok(lancamentos);
-        }catch (RegraNegocioException e){
+        public ResponseEntity findLancamentoByUsuarioId(@PathVariable("usuarioId") Long usuarioId) {
+        try {
+            List<Lancamento> lancamentos = lancamentoService.findByUsuarioId(usuarioId);
+            List<LancamentoDTO> lancamentosDTO = new ArrayList<>();
+            for(Lancamento lancamento : lancamentos){
+                lancamentosDTO.add(new LancamentoDTO(lancamento.getId(), lancamento.getDescricao(), lancamento.getMes(),
+                        lancamento.getAno(), lancamento.getValor(), lancamento.getTipoLancamento().name()));
+            }
+            return ResponseEntity.ok().body(lancamentosDTO);
+        } catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
@@ -22,5 +23,5 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     BigDecimal obterSaldoPorTipoLancamentoEUsuarioEStatus(@Param("usuarioId") Long usuarioId, @Param("tipo")TipoLancamento tipoLancamento,
                                                           @Param("status") StatusLancamento status);
 
-    Lancamento findByUsuario(Usuario usuario);
+    List<Lancamento> findByUsuario(Usuario usuario);
 }

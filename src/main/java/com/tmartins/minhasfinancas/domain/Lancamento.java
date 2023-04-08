@@ -1,5 +1,6 @@
 package com.tmartins.minhasfinancas.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tmartins.minhasfinancas.dto.LancamentoDTO;
 import com.tmartins.minhasfinancas.enumeration.StatusLancamento;
 import com.tmartins.minhasfinancas.enumeration.TipoLancamento;
@@ -34,6 +35,7 @@ public class Lancamento implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id",nullable = false)
+    @JsonIgnoreProperties("lancamento")
     private Usuario usuario;
 
     @Column(name = "descricao",nullable = false)
