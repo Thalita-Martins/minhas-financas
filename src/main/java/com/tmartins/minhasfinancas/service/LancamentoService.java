@@ -12,8 +12,10 @@ import com.tmartins.minhasfinancas.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,38 +35,43 @@ public class LancamentoService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    @Transactional(readOnly = true)
+
     public List<Lancamento> findAll() {
         return lancamentoRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public List<Lancamento> findByUsuarioId(Long usuarioId){
-        usuarioRepository.findById(usuarioId).orElseThrow(() -> new RegraNegocioException("Usuario não encontrado"));
-        return lancamentoRepository.findByUsuarioId(usuarioId);
+    public Lancamento findByUsuarioId(Long usuarioId) {
+        var usuario = usuarioRepository.findById(usuarioId).orElse(null);
+        return lancamentoRepository.findByUsuario(usuario);
     }
 
     public Lancamento atualizarStatus(Long id, AtualizaStatusDTO atualizaStatusDTO) {
-        var lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new RegraNegocioException("Lancamento não encontrado"));
+        var lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new RegraNegocioException("Lancamento " +
+                "não encontrado"));
         lancamento.setStatusLancamento(StatusLancamento.valueOf(atualizaStatusDTO.getStatus()));
         return lancamento;
     }
 
-    public Optional<Lancamento> findById(Long id) {
-        return lancamentoRepository.findById(id);
+    public List<Lancamento> findById(Long id) {
+        return lancamentoRepository.findById(id).stream()
+                .filter(lancamento -> lancamento.getAtivo().equals(true))
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public BigDecimal obterSaldoPorUsuario(Long usuarioId) {
 
-        var receitas = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuarioEStatus(usuarioId, TipoLancamento.RECEITA, StatusLancamento.EFETIVADO);
-        var despesas = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuarioEStatus(usuarioId, TipoLancamento.DESPESA, StatusLancamento.EFETIVADO);
+        var receitas = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuarioEStatus(usuarioId,
+                TipoLancamento.RECEITA, StatusLancamento.EFETIVADO);
+        var despesas = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuarioEStatus(usuarioId,
+                TipoLancamento.DESPESA, StatusLancamento.EFETIVADO);
 
-        if(isNull(receitas)) {
+        if (isNull(receitas)) {
             receitas = BigDecimal.ZERO;
         }
 
-        if(isNull(despesas)) {
+        if (isNull(despesas)) {
             despesas = BigDecimal.ZERO;
         }
 
@@ -73,40 +80,39 @@ public class LancamentoService {
 
     public Lancamento create(LancamentoDTO lancamentoDTO) {
         var lancamento = converter(lancamentoDTO);
+        lancamento.setDataCadastro(LocalDate.now());
 
         return lancamentoRepository.save(lancamento);
     }
 
     @Transactional
     public Lancamento update(LancamentoDTO lancamentoDTO) {
-        if (isNull(lancamentoDTO.getId())){
+        if (isNull(lancamentoDTO.getId())) {
             create(lancamentoDTO);
         }
-        var lancamento =  converter(lancamentoDTO);
+       var lancamento = lancamentoRepository.findById(lancamentoDTO.getId()).orElseThrow(() -> new RegraNegocioException("Lançamento não encontrado"));
+        lancamento.update(lancamentoDTO);
         return lancamentoRepository.save(lancamento);
     }
 
     @Transactional
     public void deletar(Long id) {
-        var lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new RegraNegocioException("Lancamento não encontrado"));
+        var lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new RegraNegocioException("Lancamento " +
+                "não encontrado"));
         lancamento.setAtivo(false);
     }
 
-    public Lancamento converter(LancamentoDTO lancamentoDTO){
-        var lancamento = new Lancamento();
-
-        lancamento.setDescricao(lancamentoDTO.getDescricao());
-        lancamento.setAno(lancamentoDTO.getAno());
-        lancamento.setMes(lancamentoDTO.getMes());
-        lancamento.setValor(lancamentoDTO.getValor());
-        lancamento.setStatusLancamento(StatusLancamento.valueOf(lancamentoDTO.getStatus()));
-        lancamento.setAtivo(lancamentoDTO.getAtivo());
-
-        Usuario usuario = usuarioRepository
-                .findById(lancamentoDTO.getUsuario())
-                .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado para o Id informado."));
-
-        lancamento.setUsuario(usuario);
+    public Lancamento converter(LancamentoDTO lancamentoDTO) {
+        Lancamento lancamento = Lancamento.builder()
+                .descricao(lancamentoDTO.getDescricao())
+                .mes(lancamentoDTO.getMes())
+                .ano(lancamentoDTO.getAno())
+                .valor(lancamentoDTO.getValor())
+                .tipoLancamento(TipoLancamento.valueOf(lancamentoDTO.getTipo()))
+                .statusLancamento(StatusLancamento.EFETIVADO)
+                .ativo(lancamentoDTO.getAtivo())
+                .usuario(lancamentoDTO.getUsuario())
+                .build();
         return lancamento;
     }
 }

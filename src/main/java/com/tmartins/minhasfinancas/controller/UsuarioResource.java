@@ -1,4 +1,4 @@
-package com.tmartins.minhasfinancas.api.resource;
+package com.tmartins.minhasfinancas.controller;
 
 import java.util.List;
 
@@ -85,7 +85,12 @@ public class UsuarioResource {
     }
 
     @DeleteMapping("/{usuarioId}/deletar")
-    public void deletarUsuarioId(@PathVariable("usuarioId") Long usuarioId) {
-        usuarioService.delete(usuarioId);
+    public ResponseEntity deletarUsuarioId(@PathVariable("usuarioId") Long usuarioId) {
+      try{
+          Boolean usuario = usuarioService.delete(usuarioId);
+          return new ResponseEntity(usuario, HttpStatus.CREATED);
+      }catch (RegraNegocioException e) {
+          return ResponseEntity.badRequest().body(e.getMessage());
+      }
     }
 }

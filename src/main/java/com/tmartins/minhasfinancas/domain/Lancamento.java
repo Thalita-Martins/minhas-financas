@@ -1,5 +1,6 @@
 package com.tmartins.minhasfinancas.domain;
 
+import com.tmartins.minhasfinancas.dto.LancamentoDTO;
 import com.tmartins.minhasfinancas.enumeration.StatusLancamento;
 import com.tmartins.minhasfinancas.enumeration.TipoLancamento;
 import jakarta.persistence.*;
@@ -8,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -17,7 +19,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "lancamento")
-public class Lancamento {
+public class Lancamento implements Serializable {
 
     @Id
     @Column(name = "id")
@@ -54,4 +56,14 @@ public class Lancamento {
     @Column(name = "ativo")
     private Boolean ativo = true;
 
+    public void update (LancamentoDTO lancamentoDTO){
+        this.setDescricao(lancamentoDTO.getDescricao());
+        this.setMes(lancamentoDTO.getMes());
+        this.setAno(lancamentoDTO.getAno());
+        this.setValor(lancamentoDTO.getValor());
+        this.setTipoLancamento(TipoLancamento.valueOf(lancamentoDTO.getTipo()));
+        this.setStatusLancamento(StatusLancamento.valueOf(lancamentoDTO.getStatus()));
+        this.setAtivo(lancamentoDTO.getAtivo());
+        this.setUsuario(lancamentoDTO.getUsuario());
+    }
 }

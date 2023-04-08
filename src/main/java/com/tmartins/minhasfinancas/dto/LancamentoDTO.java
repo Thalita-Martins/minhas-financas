@@ -2,12 +2,11 @@ package com.tmartins.minhasfinancas.dto;
 
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.tmartins.minhasfinancas.domain.Usuario;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,7 +17,7 @@ public class LancamentoDTO {
     private Integer mes;
     private Integer ano;
     private BigDecimal valor;
-    private Long usuario;
+    private Usuario usuario;
     private String tipo;
     private String status;
     private Boolean ativo = true;

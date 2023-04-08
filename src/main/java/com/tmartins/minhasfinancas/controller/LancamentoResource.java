@@ -1,4 +1,4 @@
-package com.tmartins.minhasfinancas.api.resource;
+package com.tmartins.minhasfinancas.controller;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import com.tmartins.minhasfinancas.dto.AtualizaStatusDTO;
 import com.tmartins.minhasfinancas.dto.LancamentoDTO;
 import com.tmartins.minhasfinancas.exception.RegraNegocioException;
 import com.tmartins.minhasfinancas.service.LancamentoService;
-import com.tmartins.minhasfinancas.service.UsuarioService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -27,22 +26,29 @@ import lombok.RequiredArgsConstructor;
 public class LancamentoResource {
 
     private final LancamentoService lancamentoService;
-    private final UsuarioService usuarioService;
 
     @GetMapping
     public ResponseEntity findAllLancamento() {
-        List<Lancamento> lancamentos = lancamentoService.findAll();
-        return ResponseEntity.ok(lancamentos);
+        try{
+            List<Lancamento> lancamentos = lancamentoService.findAll();
+            return new ResponseEntity(lancamentos, HttpStatus.OK);
+        }catch (RegraNegocioException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @GetMapping("/usuario")
-        public ResponseEntity findLancamentoByUsuarioId(@RequestParam("usuarioId") Long usuarioId){
-        List<Lancamento> lancamentos = lancamentoService.findByUsuarioId(usuarioId);
-           return ResponseEntity.ok(lancamentos);
+    @GetMapping("/usuario/{usuarioId}")
+        public ResponseEntity findLancamentoByUsuarioId(@PathVariable("usuarioId") Long usuarioId){
+        Lancamento lancamentos = lancamentoService.findByUsuarioId(usuarioId);
+        try{
+            return ResponseEntity.ok(lancamentos);
+        }catch (RegraNegocioException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity findLancamentoById(@PathVariable Long lancamentoId) {
+    public ResponseEntity findLancamentoById(@PathVariable("id") Long lancamentoId) {
         var lancamento = lancamentoService.findById(lancamentoId);
         try {
             return ResponseEntity.ok(lancamento);
@@ -51,7 +57,7 @@ public class LancamentoResource {
         }
     }
 
-    @PostMapping
+    @PostMapping("/cadastrar")
     public ResponseEntity createLancamento(@RequestBody LancamentoDTO lancamentoDTO) {
         var lancamento = lancamentoService.create(lancamentoDTO);
         try {

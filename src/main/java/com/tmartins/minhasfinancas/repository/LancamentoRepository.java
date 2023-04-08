@@ -1,6 +1,7 @@
 package com.tmartins.minhasfinancas.repository;
 
 import com.tmartins.minhasfinancas.domain.Lancamento;
+import com.tmartins.minhasfinancas.domain.Usuario;
 import com.tmartins.minhasfinancas.enumeration.StatusLancamento;
 import com.tmartins.minhasfinancas.enumeration.TipoLancamento;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,8 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 
 public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
@@ -23,5 +22,5 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     BigDecimal obterSaldoPorTipoLancamentoEUsuarioEStatus(@Param("usuarioId") Long usuarioId, @Param("tipo")TipoLancamento tipoLancamento,
                                                           @Param("status") StatusLancamento status);
 
-    List<Lancamento> findByUsuarioId(Long usuarioId);
+    Lancamento findByUsuario(Usuario usuario);
 }

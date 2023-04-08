@@ -1,9 +1,9 @@
 package com.tmartins.minhasfinancas.domain;
 
-import com.tmartins.minhasfinancas.dto.UsuarioDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "usuario")
-public class Usuario {
+public class Usuario implements Serializable {
 
     @Id
     @Column(name = "id")
@@ -34,5 +34,4 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     List<Lancamento> lancamento = new ArrayList<>();
-
 }

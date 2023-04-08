@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Objects.isNull;
@@ -30,11 +31,15 @@ public class UsuarioService {
 
     public List<Usuario> findAll(){
         return usuarioRepository.findAll()
-                .stream().filter(usuario -> usuario.getAtivo().equals(true)).toList();
+                .stream().filter(usuario -> usuario.getAtivo().equals(true))
+                .toList();
     }
 
     public Usuario findById(Long id) {
-        return usuarioRepository.findById(id).orElseThrow(() -> new RegraNegocioException("Usuário não encontrado"));
+        return usuarioRepository.findById(id).stream()
+                .filter(usuario -> usuario.getAtivo().equals(true))
+                .findAny()
+                .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado"));
     }
 
     public BigDecimal findBySaldoByUsuarioId(Long usuarioId){
@@ -83,9 +88,11 @@ public class UsuarioService {
     }
 
     @Transactional
-    public void delete(Long usuarioId){
+    public Boolean delete(Long usuarioId){
         var usuario = usuarioRepository.findById(usuarioId).orElseThrow(() -> new RegraNegocioException("Usuário não encontrado"));
         usuario.setAtivo(false);
+
+        return true;
     }
 
     public void validarEmail(String email) {
