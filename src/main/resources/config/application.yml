@@ -1,0 +1,20 @@
+spring:
+  liquibase:
+    change-log: classpath:db/changelog/changeLog.master.xml
+    default-schema: public
+  application:
+    name: minhasfinancas-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/minhasfinancas
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: 3621
+  jpa:
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQL95alect
+      ddl-auto: validate
+    open-in-view: true
+    show-sql: true
+
+server:
+  port: 8080

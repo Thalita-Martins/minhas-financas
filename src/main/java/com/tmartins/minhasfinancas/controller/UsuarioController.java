@@ -13,11 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequestMapping("/api/usuarios")
 @RequiredArgsConstructor
-public class UsuarioResource {
+public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
@@ -43,9 +42,8 @@ public class UsuarioResource {
 
     @GetMapping("/{usuarioId}/saldo")
     public ResponseEntity obterSaldoByUsuarioId(@PathVariable("usuarioId") Long usuarioId) {
-        var saldo = usuarioService.findBySaldoByUsuarioId(usuarioId);
-
         try{
+        var saldo = usuarioService.findBySaldoByUsuarioId(usuarioId);
             return ResponseEntity.ok(saldo);
         } catch (RegraNegocioException e){
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -54,9 +52,8 @@ public class UsuarioResource {
 
     @GetMapping("/obterTotal")
     public ResponseEntity obterTotalByTipoDespesa(@RequestParam(value = "usuarioId") Long usuarioId, @RequestParam(value = "tipoDespesa") String tipoDespesa) {
-        var saldo = usuarioService.findByTotalDespesa(usuarioId, tipoDespesa, "");
-
         try {
+            var saldo = usuarioService.findByTotalDespesa(usuarioId, tipoDespesa, "");
             return ResponseEntity.ok(saldo);
         } catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -65,9 +62,8 @@ public class UsuarioResource {
 
     @GetMapping("/{usuarioId}/totalDespesa")
     public ResponseEntity obterTotalByTipoDespesaStatus(@PathVariable("usuarioId") Long usuarioId, @RequestParam(value = "tipoDespesa") String tipoDespesa, @RequestParam(value = "statusDespesa") String statusDespesa) {
-        var saldo = usuarioService.findByTotalDespesa(usuarioId, tipoDespesa, statusDespesa);
-
         try {
+            var saldo = usuarioService.findByTotalDespesa(usuarioId, tipoDespesa, statusDespesa);
             return ResponseEntity.ok(saldo);
         } catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

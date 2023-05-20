@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/lancamentos")
 @RequiredArgsConstructor
-public class LancamentoResource {
+public class LancamentoController {
 
     private final LancamentoService lancamentoService;
 
@@ -55,8 +55,8 @@ public class LancamentoResource {
 
     @GetMapping("/{id}")
     public ResponseEntity findLancamentoById(@PathVariable("id") Long lancamentoId) {
-        var lancamento = lancamentoService.findById(lancamentoId);
         try {
+            var lancamento = lancamentoService.findById(lancamentoId);
             return ResponseEntity.ok(lancamento);
         }catch (RegraNegocioException e){
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -65,8 +65,8 @@ public class LancamentoResource {
 
     @PostMapping("/cadastrar")
     public ResponseEntity createLancamento(@RequestBody LancamentoDTO lancamentoDTO) {
-        var lancamento = lancamentoService.create(lancamentoDTO);
         try {
+            var lancamento = lancamentoService.create(lancamentoDTO);
             return ResponseEntity.ok(lancamento);
         }catch (RegraNegocioException e){
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -75,8 +75,8 @@ public class LancamentoResource {
 
     @PutMapping("/atualizar")
     public ResponseEntity updateLancamento(@RequestBody LancamentoDTO lancamentoDTO) {
-        var lancamento = lancamentoService.update(lancamentoDTO);
         try{
+            var lancamento = lancamentoService.update(lancamentoDTO);
             return ResponseEntity.ok(lancamento);
         }catch (RegraNegocioException e){
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -84,10 +84,9 @@ public class LancamentoResource {
     }
 
     @PutMapping("/{id}/atualiza-status")
-    public ResponseEntity atualizarStatusLancamentoId(@PathVariable("lancamentoId") Long id,
-                                                    @RequestBody AtualizaStatusDTO atualizaStatusDTO) {
-        var lancamento = lancamentoService.atualizarStatus(id, atualizaStatusDTO);
+    public ResponseEntity atualizarStatusLancamentoId(@PathVariable("lancamentoId") Long id,@RequestBody AtualizaStatusDTO atualizaStatusDTO) {
         try{
+            var lancamento = lancamentoService.atualizarStatus(id, atualizaStatusDTO);
             return ResponseEntity.ok(lancamento);
         }catch (RegraNegocioException e){
             return ResponseEntity.badRequest().body(e.getMessage());

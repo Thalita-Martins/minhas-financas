@@ -1,0 +1,43 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="20230520170300" author="Thalita">
+        <createSequence sequenceName="usuario_id_seq"/>
+
+        <createTable tableName="usuario">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="usuario_id_seq"/>
+            <column name="nome" type="varchar(200)"/>
+            <column name="email" type="varchar(200)"/>
+            <column name="senha" type="varchar(200)"/>
+            <column name="ativo" type="boolean"/>
+        </createTable>
+
+        <addPrimaryKey tableName="usuario" columnNames="id" constraintName="usuario_id_PK"/>
+    </changeSet>
+
+    <changeSet id="20230520170400" author="Thalita">
+        <createSequence sequenceName="lancamento_id_seq"/>
+
+        <createTable tableName="lancamento">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="lancamento_id_seq"/>
+            <column name="mes" type="integer"/>
+            <column name="ano" type="integer"/>
+            <column name="usuario_id" type="BIGINT"/>
+            <column name="descricao" type="varchar(200)"/>
+            <column name="valor" type="NUMERIC(16,2)"/>
+            <column name="data_cadastro" type="date"/>
+            <column name="tipo" type="varchar(100)"/>
+            <column name="status" type="varchar(100)"/>
+            <column name="ativo" type="boolean"/>
+        </createTable>
+
+        <addPrimaryKey tableName="lancamento" columnNames="id" constraintName="lancamento_id_PK"/>
+
+        <addForeignKeyConstraint baseTableName="lancamento" baseColumnNames="usuario_id"
+                                 constraintName="lancamento_usuario_id_FK" referencedTableName="usuario"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
