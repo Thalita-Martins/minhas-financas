@@ -8,7 +8,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/minhasfinancas
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: 3621
+    password:
   jpa:
     hibernate:
       dialect: org.hibernate.dialect.PostgreSQL95alect

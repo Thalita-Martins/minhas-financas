@@ -10,14 +10,7 @@ import com.tmartins.minhasfinancas.exception.RegraNegocioException;
 import com.tmartins.minhasfinancas.service.LancamentoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,9 +22,13 @@ public class LancamentoController {
     private final LancamentoService lancamentoService;
 
     @GetMapping
-    public ResponseEntity findAllLancamento() {
+    public ResponseEntity findAllLancamento(@RequestParam(value ="descricao" , required = false) String descricao,
+                                            @RequestParam(value ="tipo" , required = false) String tipo,
+                                            @RequestParam(value = "mes", required = false) Integer mes,
+                                            @RequestParam(value = "ano", required = false) Integer ano,
+                                            @RequestParam("usuario") Long usuarioId) {
         try{
-            List<Lancamento> lancamentos = lancamentoService.findAll();
+            List<Lancamento> lancamentos = lancamentoService.findAll(descricao, tipo, mes, ano, usuarioId);
             return new ResponseEntity(lancamentos, HttpStatus.OK);
         }catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -45,7 +42,7 @@ public class LancamentoController {
             List<LancamentoDTO> lancamentosDTO = new ArrayList<>();
             for(Lancamento lancamento : lancamentos){
                 lancamentosDTO.add(new LancamentoDTO(lancamento.getId(), lancamento.getDescricao(), lancamento.getMes(),
-                        lancamento.getAno(), lancamento.getValor(), lancamento.getTipoLancamento().name()));
+                        lancamento.getAno(), lancamento.getValor(), lancamento.getTipoLancamento().name(), lancamento.getStatusLancamento().name()));
             }
             return ResponseEntity.ok().body(lancamentosDTO);
         } catch (RegraNegocioException e) {

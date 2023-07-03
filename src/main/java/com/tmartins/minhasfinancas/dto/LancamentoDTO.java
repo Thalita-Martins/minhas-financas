@@ -5,8 +5,7 @@ import java.math.BigDecimal;
 import com.tmartins.minhasfinancas.domain.Usuario;
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,16 +17,17 @@ public class LancamentoDTO {
     private Integer ano;
     private BigDecimal valor;
     private Usuario usuario;
-    private String tipo;
-    private String status;
+    private String tipoLancamento;
+    private String statusLancamento;
     private Boolean ativo = true;
 
-    public LancamentoDTO(Long id, String descricao, Integer mes, Integer ano, BigDecimal valor, String tipo) {
+    public LancamentoDTO(Long id, String descricao, Integer mes, Integer ano, BigDecimal valor, String tipo, String status){
         this.id = id;
         this.descricao = descricao;
         this.mes = mes;
         this.ano = ano;
         this.valor = valor;
-        this.tipo = tipo;
+        this.tipoLancamento = tipo;
+        this.statusLancamento = status;
     }
 }

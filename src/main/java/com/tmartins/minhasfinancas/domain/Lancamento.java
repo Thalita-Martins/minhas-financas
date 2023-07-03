@@ -70,9 +70,8 @@ public class Lancamento implements Serializable {
         this.setMes(lancamentoDTO.getMes());
         this.setAno(lancamentoDTO.getAno());
         this.setValor(lancamentoDTO.getValor());
-        this.setTipoLancamento(TipoLancamento.valueOf(lancamentoDTO.getTipo()));
-        this.setStatusLancamento(StatusLancamento.valueOf(lancamentoDTO.getStatus()));
-        this.setAtivo(lancamentoDTO.getAtivo());
+        this.setTipoLancamento(TipoLancamento.valueOf(lancamentoDTO.getTipoLancamento()));
+        this.setStatusLancamento(StatusLancamento.valueOf(lancamentoDTO.getStatusLancamento()));
         this.setUsuario(lancamentoDTO.getUsuario());
     }
 }

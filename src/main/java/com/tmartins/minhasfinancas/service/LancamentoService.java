@@ -8,6 +8,7 @@ import com.tmartins.minhasfinancas.enumeration.TipoLancamento;
 import com.tmartins.minhasfinancas.exception.RegraNegocioException;
 import com.tmartins.minhasfinancas.repository.LancamentoRepository;
 import com.tmartins.minhasfinancas.repository.UsuarioRepository;
+import com.tmartins.minhasfinancas.specification.LancamentoSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 
 @Service
@@ -25,15 +27,22 @@ public class LancamentoService {
 
     private final LancamentoRepository lancamentoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final LancamentoSpecification lancamentoSpecification;
 
     @Autowired
-    public LancamentoService(LancamentoRepository repository, UsuarioRepository usuarioRepository) {
+    public LancamentoService(LancamentoRepository repository, UsuarioRepository usuarioRepository,
+                             LancamentoSpecification lancamentoSpecification) {
         this.lancamentoRepository = repository;
         this.usuarioRepository = usuarioRepository;
+        this.lancamentoSpecification = lancamentoSpecification;
     }
 
-    public List<Lancamento> findAll() {
-        return lancamentoRepository.findAll();
+    public List<Lancamento> findAll(String descricao, String tipo, Integer mes, Integer ano, Long usuarioId) {
+        TipoLancamento tipoLancamento = null;
+        if (nonNull(tipo)){
+            tipoLancamento = TipoLancamento.valueOf(tipo);
+        }
+        return lancamentoRepository.findAll(lancamentoSpecification.filters(usuarioId, descricao,ano, mes, tipoLancamento));
     }
 
     @Transactional(readOnly = true)
@@ -49,17 +58,15 @@ public class LancamentoService {
         return lancamento;
     }
 
-    public List<Lancamento> findById(Long id) {
-        return lancamentoRepository.findById(id).stream()
-                .filter(lancamento -> lancamento.getAtivo().equals(true))
-                .toList();
+    public Lancamento findById(Long id) {
+        return lancamentoRepository.findById(id).orElseThrow(() -> new RegraNegocioException("Lancamento não encontrado"));
     }
 
     @Transactional(readOnly = true)
     public BigDecimal obterSaldoPorUsuario(Long usuarioId) {
 
         var receitas = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuarioEStatus(usuarioId,
-                TipoLancamento.RECEITA, StatusLancamento.QUITADO);
+                TipoLancamento.RECEITA, StatusLancamento.CREDITO);
         var despesas = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuarioEStatus(usuarioId,
                 TipoLancamento.DESPESA, StatusLancamento.QUITADO);
 
@@ -96,6 +103,7 @@ public class LancamentoService {
         var lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new RegraNegocioException("Lancamento " +
                 "não encontrado"));
         lancamento.setAtivo(false);
+        lancamentoRepository.save(lancamento);
     }
 
     public Lancamento converter(LancamentoDTO lancamentoDTO) {
@@ -104,9 +112,8 @@ public class LancamentoService {
                 .mes(lancamentoDTO.getMes())
                 .ano(lancamentoDTO.getAno())
                 .valor(lancamentoDTO.getValor())
-                .tipoLancamento(TipoLancamento.valueOf(lancamentoDTO.getTipo()))
-                .statusLancamento(StatusLancamento.PENDENTE)
-                .ativo(lancamentoDTO.getAtivo())
+                .tipoLancamento(TipoLancamento.valueOf(lancamentoDTO.getTipoLancamento()))
+                .statusLancamento(StatusLancamento.valueOf(lancamentoDTO.getStatusLancamento()))
                 .usuario(lancamentoDTO.getUsuario())
                 .build();
         return lancamento;

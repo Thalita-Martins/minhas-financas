@@ -1,6 +1,18 @@
 package com.tmartins.minhasfinancas.enumeration;
 
 public enum StatusLancamento {
-    PENDENTE,
-    QUITADO
+
+    CREDITO("CREDITO"),
+    PENDENTE("PENDENTE"),
+    QUITADO("QUITADO");
+
+    private final String status;
+
+    StatusLancamento(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
+    }
 }
