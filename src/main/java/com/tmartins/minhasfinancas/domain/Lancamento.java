@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tmartins.minhasfinancas.dto.LancamentoDTO;
 import com.tmartins.minhasfinancas.enumeration.StatusLancamento;
 import com.tmartins.minhasfinancas.enumeration.TipoLancamento;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;

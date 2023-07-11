@@ -4,6 +4,7 @@ public enum StatusLancamento {
 
     CREDITO("CREDITO"),
     PENDENTE("PENDENTE"),
+    CANCELADO("CANCELADO"),
     QUITADO("QUITADO");
 
     private final String status;

@@ -3,9 +3,11 @@ package com.tmartins.minhasfinancas.controller;
 import java.util.List;
 
 import com.tmartins.minhasfinancas.domain.Usuario;
+import com.tmartins.minhasfinancas.dto.TokenDTO;
 import com.tmartins.minhasfinancas.dto.UsuarioDTO;
 import com.tmartins.minhasfinancas.exception.ErroAutenticacao;
 import com.tmartins.minhasfinancas.exception.RegraNegocioException;
+import com.tmartins.minhasfinancas.security.JwtService;
 import com.tmartins.minhasfinancas.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final JwtService jwtService;
 
     @GetMapping
     public ResponseEntity findAllUsuario() {
@@ -74,8 +77,9 @@ public class UsuarioController {
     public ResponseEntity<?> autenticar(@RequestBody UsuarioDTO usuarioDTO) {
         try {
             Usuario usuarioAutenticado = usuarioService.autenticar(usuarioDTO.getEmail(), usuarioDTO.getSenha());
-
-            return ResponseEntity.ok(usuarioAutenticado);
+            String token = jwtService.gerarToken(usuarioAutenticado);
+            TokenDTO tokenDTO = new TokenDTO(usuarioAutenticado.getNome(), token);
+            return ResponseEntity.ok(tokenDTO);
         } catch (ErroAutenticacao e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

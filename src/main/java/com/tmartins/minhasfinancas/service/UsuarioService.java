@@ -6,13 +6,12 @@ import com.tmartins.minhasfinancas.exception.ErroAutenticacao;
 import com.tmartins.minhasfinancas.exception.RegraNegocioException;
 import com.tmartins.minhasfinancas.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -22,11 +21,14 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final LancamentoService lancamentoService;
+    private PasswordEncoder encoder;
 
     @Autowired
-    public UsuarioService(UsuarioRepository usuarioRepository, LancamentoService lancamentoService) {
+    public UsuarioService(UsuarioRepository usuarioRepository, LancamentoService lancamentoService,
+                          PasswordEncoder encoder) {
         this.usuarioRepository = usuarioRepository;
         this.lancamentoService = lancamentoService;
+        this.encoder = encoder;
     }
 
     public List<Usuario> findAll(){
@@ -49,16 +51,14 @@ public class UsuarioService {
     }
 
     public Usuario autenticar(String email, String senha) {
-        Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+        var usuario = usuarioRepository.findByEmail(email).orElseThrow(() -> new ErroAutenticacao("Usuário não encontrado para o email informado."));
 
-        if(usuario.isEmpty()) {
-            throw new ErroAutenticacao("Usuário não encontrado para o email informado.");
-        }
+        var compararSenhas = encoder.matches(senha, usuario.getSenha());
 
-        if (!usuario.get().getSenha().equals(senha)) {
+        if (!compararSenhas) {
             throw new ErroAutenticacao("Senha inválida");
         }
-        return usuario.get();
+        return usuario;
     }
 
     @Transactional
@@ -68,6 +68,7 @@ public class UsuarioService {
         }
         var usuario = converter(usuarioDTO);
         validarEmail(usuario.getEmail());
+        criptografarSenha(usuario);
 
         return usuarioRepository.save(usuario);
     }
@@ -100,6 +101,11 @@ public class UsuarioService {
         if(existe) {
             throw new RegraNegocioException("Já existe um usuário cadastrado com este email.");
         }
+    }
+
+    public void criptografarSenha(Usuario usuario){
+        var senhaCripto = encoder.encode(usuario.getSenha());
+        usuario.setSenha(senhaCripto);
     }
 
     public Usuario converter(UsuarioDTO usuarioDTO){

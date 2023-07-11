@@ -17,6 +17,7 @@ public class MinhasfinancasApplication implements WebMvcConfigurer {
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
 	}
+	
 	public static void main(String[] args) {
 		SpringApplication.run(MinhasfinancasApplication.class, args);
 	}

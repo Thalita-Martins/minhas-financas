@@ -55,6 +55,7 @@ public class LancamentoService {
     public Lancamento atualizarStatus(Long id, AtualizaStatusDTO atualizaStatusDTO) {
         var lancamento = lancamentoRepository.findById(id).orElseThrow(() -> new RegraNegocioException("Lancamento não encontrado"));
         lancamento.setStatusLancamento(StatusLancamento.valueOf(atualizaStatusDTO.getStatus()));
+        lancamentoRepository.save(lancamento);
         return lancamento;
     }
 
@@ -115,6 +116,7 @@ public class LancamentoService {
                 .tipoLancamento(TipoLancamento.valueOf(lancamentoDTO.getTipoLancamento()))
                 .statusLancamento(StatusLancamento.valueOf(lancamentoDTO.getStatusLancamento()))
                 .usuario(lancamentoDTO.getUsuario())
+                .ativo(lancamentoDTO.getAtivo())
                 .build();
         return lancamento;
     }

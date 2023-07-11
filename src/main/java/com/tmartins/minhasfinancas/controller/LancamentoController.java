@@ -1,6 +1,5 @@
 package com.tmartins.minhasfinancas.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.tmartins.minhasfinancas.domain.Lancamento;
@@ -31,21 +30,6 @@ public class LancamentoController {
             List<Lancamento> lancamentos = lancamentoService.findAll(descricao, tipo, mes, ano, usuarioId);
             return new ResponseEntity(lancamentos, HttpStatus.OK);
         }catch (RegraNegocioException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/usuario/{usuarioId}")
-        public ResponseEntity findLancamentoByUsuarioId(@PathVariable("usuarioId") Long usuarioId) {
-        try {
-            List<Lancamento> lancamentos = lancamentoService.findByUsuarioId(usuarioId);
-            List<LancamentoDTO> lancamentosDTO = new ArrayList<>();
-            for(Lancamento lancamento : lancamentos){
-                lancamentosDTO.add(new LancamentoDTO(lancamento.getId(), lancamento.getDescricao(), lancamento.getMes(),
-                        lancamento.getAno(), lancamento.getValor(), lancamento.getTipoLancamento().name(), lancamento.getStatusLancamento().name()));
-            }
-            return ResponseEntity.ok().body(lancamentosDTO);
-        } catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -81,7 +65,7 @@ public class LancamentoController {
     }
 
     @PutMapping("/{id}/atualiza-status")
-    public ResponseEntity atualizarStatusLancamentoId(@PathVariable("lancamentoId") Long id,@RequestBody AtualizaStatusDTO atualizaStatusDTO) {
+    public ResponseEntity atualizarStatusLancamentoId(@PathVariable("id") Long id,@RequestBody AtualizaStatusDTO atualizaStatusDTO) {
         try{
             var lancamento = lancamentoService.atualizarStatus(id, atualizaStatusDTO);
             return ResponseEntity.ok(lancamento);
