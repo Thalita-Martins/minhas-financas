@@ -40,7 +40,7 @@ public class Lancamento implements Serializable {
     @Column(name = "ano")
     private Integer ano;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JsonIgnoreProperties("lancamento")
     @JoinColumn(name = "usuario_id",nullable = false)
     private Usuario usuario;
